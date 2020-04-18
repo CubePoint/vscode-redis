@@ -30,7 +30,7 @@
 
                 <!-- key ttl -->
                 <el-form-item>
-                    <el-input v-model="edit.ttl" @keyup.enter.native="ttlKey">
+                    <el-input v-model="edit.ttl" @keyup.enter.native="ttlKey" type='number'>
                         <span slot="prepend">TTL</span>
                         <i class="el-icon-check el-input__icon cursor-pointer" slot="suffix"
                             :title="'Click to change ttl'" @click="ttlKey">
@@ -204,11 +204,16 @@
                 vue.edit = vue.deepClone(data.res)
                 break;
             default:
-                vue.$message(event.data.res)
+                vue.$message(data.res)
                 break;
         }
     })
     postMessage({ type: 'init' })
+    setInterval(() => {
+        if (vue.edit && vue.edit.ttl) {
+            vue.edit.ttl = vue.edit.ttl - 1
+        }
+    }, 1000)
 </script>
 <style type="text/css">
     body {

@@ -87,7 +87,8 @@ export default class KeyNode extends AbstractNode {
                         vscode.commands.executeCommand(Command.REFRESH)
                         break;
                     case 'ttl':
-                        await promisify(client.del).bind(client)(message.key.name)
+                        await promisify(client.expire).bind(client)(message.key.name,message.key.ttl)
+                        viewPanel.webview.postMessage({res:`Change TTL for key:${message.key.name} success!`})
                         vscode.commands.executeCommand(Command.REFRESH)
                         break;
                 }
