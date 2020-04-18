@@ -29,7 +29,7 @@ export class ViewOption {
 export class ViewManager {
 
     private static extensionPath: string;
-    private static viewStatu: { [key: string]: { instance: WebviewPanel, creating: boolean } } = {};
+    private static viewStatu: { [key: string]: { instance: WebviewPanel, creating: boolean, receiveListener: (viewPanel: WebviewPanel, message: any) => void } } = {};
     public static initExtesnsionPath(extensionPath: string) {
         this.extensionPath = extensionPath;
     }
@@ -47,7 +47,8 @@ export class ViewManager {
             if (viewOption.killHidden && currentStatus.instance.visible == false) {
                 currentStatus.instance.dispose()
             } else {
-                if (viewOption.initListener) viewOption.initListener(currentStatus.instance)
+                viewOption.initListener(currentStatus.instance)
+                if (viewOption.receiveListener) currentStatus.receiveListener = viewOption.receiveListener
                 return Promise.resolve(null);
             }
         }
@@ -72,17 +73,19 @@ export class ViewManager {
                         .with({ scheme: 'vscode-resource' }).toString());
                 ViewManager.viewStatu[viewOption.viewType] = {
                     creating: true,
-                    instance: webviewPanel
+                    instance: webviewPanel,
+                    receiveListener: viewOption.receiveListener
                 }
                 webviewPanel.onDidDispose(() => {
                     ViewManager.viewStatu[viewOption.viewType] = null
                 })
+                const newStatus = ViewManager.viewStatu[viewOption.viewType]
                 webviewPanel.webview.onDidReceiveMessage((message) => {
-                    if (message.type == 'init' && ViewManager.viewStatu[viewOption.viewType]) {
-                        ViewManager.viewStatu[viewOption.viewType].creating = false
-                        if (viewOption.initListener) viewOption.initListener(webviewPanel)
-                    } else if (viewOption.receiveListener) {
-                        viewOption.receiveListener(webviewPanel, message)
+                    if (message.type == 'init') {
+                        newStatus.creating = false
+                        if (viewOption.initListener) { viewOption.initListener(webviewPanel) }
+                    } else if (newStatus.receiveListener) {
+                        newStatus.receiveListener(webviewPanel, message)
                     }
                 })
                 resolve(null);

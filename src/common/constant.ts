@@ -13,10 +13,6 @@ export enum Command {
     REFRESH = "redis.refresh"
 }
 
-export enum ResultType {
-    DETAIL = "detail"
-}
-
 export enum RedisType {
     hash='hash',list='list',string='string',zset='zset',set='set'
 }

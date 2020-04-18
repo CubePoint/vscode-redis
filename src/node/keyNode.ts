@@ -1,13 +1,13 @@
-import * as vscode from "vscode";
 import path from "path";
 import { promisify } from "util";
+import * as vscode from "vscode";
 import { TreeItemCollapsibleState } from "vscode";
-import { NodeType, Command, ResultType, RedisType } from "../common/constant";
-import { RedisConfig } from "./config/redisConfig";
+import { Command, NodeType, RedisType } from "../common/constant";
+import { ViewManager } from "../common/viewManager";
 import { ClientManager } from "../manager/clientManager";
 import AbstractNode from "./abstracNode";
+import { RedisConfig } from "./config/redisConfig";
 import DBNode from "./dbNode";
-import { ViewManager } from "../common/viewManager";
 
 export default class KeyNode extends AbstractNode {
 
@@ -46,13 +46,22 @@ export default class KeyNode extends AbstractNode {
             case RedisType.string:
                 content = await promisify(client.get).bind(client)(this.name)
                 break;
-            case RedisType.list:
-                break;
             case RedisType.hash:
+                const hall = await promisify(client.hgetall).bind(client)(this.name)
+                content = Object.keys(hall).map(key => {
+                    return { key, value: hall[key] }
+                })
+                break;
+            case RedisType.list:
+                content = await promisify(client.lrange).bind(client)
+                    (this.name, 0, await promisify(client.llen).bind(client)(this.name))
                 break;
             case RedisType.set:
+                content = await promisify(client.smembers).bind(client)(this.name)
                 break;
             case RedisType.zset:
+                content = await promisify(client.zrange).bind(client)
+                    (this.name, 0, await promisify(client.zcard).bind(client)(this.name))
                 break;
         }
         ViewManager.createWebviewPanel({
@@ -60,13 +69,25 @@ export default class KeyNode extends AbstractNode {
             viewTitle: "Key Detail", splitResultView: true,
             initListener: async (viewPanel) => {
                 viewPanel.webview.postMessage({
-                    type: ResultType.DETAIL,
+                    type: "detail",
                     res: {
                         content, type,
                         name: this.name,
                         ttl: await promisify(client.ttl).bind(client)(this.name)
                     }
                 })
+            },
+            receiveListener: async (viewPanel, message) => {
+                switch (message.type) {
+                    case 'del':
+                        await promisify(client.del).bind(client)(message.key.name)
+                        vscode.commands.executeCommand(Command.REFRESH)
+                        break;
+                    case 'ttl':
+                        await promisify(client.del).bind(client)(message.key.name)
+                        vscode.commands.executeCommand(Command.REFRESH)
+                        break;
+                }
 
             }
         })
