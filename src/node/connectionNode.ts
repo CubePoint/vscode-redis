@@ -1,6 +1,7 @@
 import path from "path";
 import { TreeItemCollapsibleState } from "vscode";
-import { NodeType } from "../common/constant";
+import { NodeType, Command } from "../common/constant";
+import * as vscode from "vscode";
 import AbstractNode from "./abstracNode";
 import { RedisConfig } from "./config/redisConfig";
 import DBNode from "./dbNode";
@@ -46,6 +47,7 @@ class ConnectionNode extends AbstractNode {
                         client.send_command(command, splitCommand, (err, response) => {
                             const reply = err ? err.message : response
                             viewPanel.webview.postMessage({ type: 'result', reply })
+                            vscode.commands.executeCommand(Command.REFRESH)
                         })
                         break;
                     case 'exit':
