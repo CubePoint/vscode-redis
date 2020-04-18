@@ -79,6 +79,9 @@ export default class KeyNode extends AbstractNode {
             },
             receiveListener: async (viewPanel, message) => {
                 switch (message.type) {
+                    case 'refresh':
+                        this.detail()
+                        break;
                     case 'del':
                         await promisify(client.del).bind(client)(message.key.name)
                         vscode.commands.executeCommand(Command.REFRESH)

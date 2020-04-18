@@ -95,7 +95,7 @@
                 </div>
                 <!-- content table -->
                 <div>
-                    <el-table :data="key.content" stripe size="small" border >
+                    <el-table :data="key.content" stripe size="small" border>
                         <el-table-column type="index" label="ID" sortable width="60" align="center">
                         </el-table-column>
                         <el-table-column v-if="key.type=='hash'" resizable sortable label="Key" align="center">
@@ -166,6 +166,8 @@
             },
             deleteKey() {
                 postMessage({ type: 'del', key: { name: this.key.name } })
+                this.key = {}
+                this.edit = {}
             },
             rename() {
                 console.log(this.key.name)
