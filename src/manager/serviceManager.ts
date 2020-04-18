@@ -16,6 +16,7 @@ export default class ServiceManager {
     }
 
     public init(): Disposable[] {
+        NodeState.init(this.context)
         if (this.isInit) return []
         const res: Disposable[] = []
 

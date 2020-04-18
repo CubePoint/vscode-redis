@@ -1,6 +1,7 @@
 import { ExtensionContext, TreeItemCollapsibleState } from "vscode";
 import { CacheKey, NodeType } from "../common/constant";
 import AbstractNode from "../node/abstracNode";
+import DBNode from "../node/dbNode";
 
 export class NodeState {
 
@@ -51,8 +52,10 @@ export class NodeState {
 
         if (this.collpaseState[element.id]) {
             return this.collpaseState[element.id];
-        } else if (element.contextValue == NodeType.CONNECTION || element.contextValue == NodeType.DB) {
+        } else if (element.contextValue == NodeType.CONNECTION || element.contextValue == NodeType.FOLDER) {
             return TreeItemCollapsibleState.Expanded;
+        } else if (element.contextValue == NodeType.DB) {
+            return (element as DBNode).index == 0 ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
         } else {
             return TreeItemCollapsibleState.Collapsed;
         }

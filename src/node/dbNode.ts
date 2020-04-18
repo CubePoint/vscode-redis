@@ -6,6 +6,7 @@ import { RedisConfig } from "./config/redisConfig";
 import { ClientManager } from "../manager/clientManager";
 import AbstractNode from "./abstracNode";
 import KeyNode from "./keyNode";
+import { NodeState } from "../manager/nodeState";
 
 export default class DBNode extends AbstractNode {
 
@@ -15,6 +16,7 @@ export default class DBNode extends AbstractNode {
         super(name, TreeItemCollapsibleState.Collapsed);
         this.id = `${redisConfig.host}-${redisConfig.port}-${index}-${parentPattern}.${name}`
         this.iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.png`);
+        this.collapsibleState = NodeState.get(this)
     }
 
     async getChildren(): Promise<AbstractNode[]> {

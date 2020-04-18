@@ -4,6 +4,7 @@ import { NodeType } from "../common/constant";
 import AbstractNode from "./abstracNode";
 import { RedisConfig } from "./config/redisConfig";
 import DBNode from "./dbNode";
+import { NodeState } from "../manager/nodeState";
 
 class ConnectionNode extends AbstractNode {
 
@@ -12,6 +13,7 @@ class ConnectionNode extends AbstractNode {
     constructor(readonly name: string, readonly redisConfig: RedisConfig) {
         super(name, TreeItemCollapsibleState.Collapsed);
         this.id = name;
+        this.collapsibleState = NodeState.get(this)
     }
 
     async getChildren() {
