@@ -75,6 +75,10 @@
                 }
             },
             {
+                "command": "redis.connection.status",
+                "title": "Server status"
+            },
+            {
                 "command": "redis.connection.delete",
                 "title": "Delete connection",
                 "icon": "resources/image/delete.png"
@@ -117,6 +121,11 @@
                     "group": "inline"
                 },
                 {
+                    "command": "redis.connection.status",
+                    "when": "view == github.cweijan.redis && viewItem == connection",
+                    "group": "connection"
+                },
+                {
                     "command": "redis.key.add",
                     "when": "view == github.cweijan.redis && viewItem == db",
                     "group": "inline"
@@ -143,6 +152,7 @@
     "devDependencies": {
         "@types/node": "^13.13.0",
         "@types/redis": "^2.8.18",
+        "tslint": "^6.1.1",
         "typescript": "^3.8.3",
         "vscode": "^1.1.36"
     },

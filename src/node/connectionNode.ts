@@ -5,9 +5,10 @@ import AbstractNode from "./abstracNode";
 import { RedisConfig } from "./config/redisConfig";
 import DBNode from "./dbNode";
 import { NodeState } from "../manager/nodeState";
+import { ClientManager } from "../manager/clientManager";
+import { ViewManager } from "../common/viewManager";
 
 class ConnectionNode extends AbstractNode {
-
     contextValue = NodeType.CONNECTION;
     iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.png`);
     constructor(readonly name: string, readonly redisConfig: RedisConfig) {
@@ -22,6 +23,18 @@ class ConnectionNode extends AbstractNode {
             result.push(new DBNode(this.redisConfig, this.name, `DB${i}`, i));
         }
         return result
+    }
+    async showStatus(): Promise<any> {
+        const client = await ClientManager.getClient(this.redisConfig)
+        client.info((err, reply) => {
+            ViewManager.createWebviewPanel({
+                viewType: "redis.status", splitResultView: false,
+                viewPath: "status", viewTitle: "Redis Server Status",
+                initListener: (viewPanel) => {
+                    viewPanel.webview.postMessage(reply)
+                }
+            })
+        })
     }
 }
 

@@ -4,6 +4,7 @@ import ConnectionProvider from "./connectionProvider";
 import Terminal from "./terminal";
 import Panel from "./panel";
 import { NodeState } from "./nodeState";
+import { ViewManager } from "../common/viewManager";
 
 export default class ServiceManager {
     public provider: ConnectionProvider;
@@ -16,6 +17,7 @@ export default class ServiceManager {
     }
 
     public init(): Disposable[] {
+        ViewManager.initExtesnsionPath(this.context.extensionPath)
         NodeState.init(this.context)
         if (this.isInit) return []
         const res: Disposable[] = []

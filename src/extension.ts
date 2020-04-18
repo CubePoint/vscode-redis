@@ -10,6 +10,7 @@ export function activate(context: ExtensionContext) {
     context.subscriptions.push(
         ...serviceManager.init(),
         commands.registerCommand('redis.connection.add', () => serviceManager.provider.add()),
+        commands.registerCommand('redis.connection.status', (connectionNode: ConnectionNode) => connectionNode.showStatus()),
         commands.registerCommand('redis.connection.delete', (element: ConnectionNode) => serviceManager.provider.delete(element)),
         commands.registerCommand(Command.REFRESH, () => serviceManager.provider.refresh()),
         commands.registerCommand('redis.key.add', (element: DBNode) => element.addKey()),
