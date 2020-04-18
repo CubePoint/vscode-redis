@@ -1,5 +1,5 @@
 export enum NodeType {
-    CONNECTION = 'connection', DB = 'db',FOLDER = 'folder',
+    CONNECTION = 'connection', DB = 'db', FOLDER = 'folder',
     KEY = 'key', INFO = "info"
 }
 
@@ -11,4 +11,12 @@ export enum CacheKey {
 
 export enum Command {
     REFRESH = "redis.refresh"
+}
+
+export enum ResultType {
+    DETAIL = "detail"
+}
+
+export enum RedisType {
+    hash='hash',list='list',string='string',zset='zset',set='set'
 }

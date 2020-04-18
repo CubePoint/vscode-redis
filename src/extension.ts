@@ -14,7 +14,7 @@ export function activate(context: ExtensionContext) {
         commands.registerCommand('redis.connection.delete', (element: ConnectionNode) => serviceManager.provider.delete(element)),
         commands.registerCommand(Command.REFRESH, () => serviceManager.provider.refresh()),
         commands.registerCommand('redis.key.add', (element: DBNode) => element.addKey()),
-        commands.registerCommand('redis.key.detail', (element: KeyNode) => serviceManager.panel.show(element)),
+        commands.registerCommand('redis.key.detail', (element: KeyNode) => element.detail()),
         commands.registerCommand('redis.key.del', (element: KeyNode) => element.delete()),
     )
 }

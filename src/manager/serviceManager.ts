@@ -1,19 +1,16 @@
 import * as vscode from "vscode";
-import { ExtensionContext, Disposable } from "vscode";
-import ConnectionProvider from "./connectionProvider";
-import Terminal from "./terminal";
-import Panel from "./panel";
-import { NodeState } from "./nodeState";
+import { Disposable, ExtensionContext } from "vscode";
 import { ViewManager } from "../common/viewManager";
+import ConnectionProvider from "./connectionProvider";
+import { NodeState } from "./nodeState";
+import Terminal from "./terminal";
 
 export default class ServiceManager {
     public provider: ConnectionProvider;
     public terminal: Terminal;
-    public panel: Panel;
     private isInit = false;
     constructor(private context: ExtensionContext) {
         this.terminal = new Terminal(context);
-        this.panel = new Panel(context);
     }
 
     public init(): Disposable[] {

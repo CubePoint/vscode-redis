@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="${webviewPath}/css/element.css">
+    <script src="${webviewPath}/js/vue.js"></script>
+    <script src="${webviewPath}/js/element.js"></script>
+    <link rel="stylesheet" href="css/element.css">
+    <script src="js/vue.js"></script>
+    <script src="js/element.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <el-container direction="vertical" class="key-tab-container">
+            <!-- key info -->
+            <el-form :inline="true">
+                <!-- key name -->
+                <el-form-item>
+                    <el-input ref="keyNameInput" v-model="edit.name" @keyup.enter.native="rename"
+                        placeholder="set to rename key">
+                        <span slot="prepend" class="key-detail-type">{{ key.type }}</span>
+                        <i class="el-icon-check el-input__icon cursor-pointer" slot="suffix" :title="'Click to rename'"
+                            @click="rename">
+                        </i>
+                    </el-input>
+                </el-form-item>
+
+                <!-- key ttl -->
+                <el-form-item>
+                    <el-input v-model="edit.ttl" @keyup.enter.native="ttlKey">
+                        <span slot="prepend">TTL</span>
+                        <i class="el-icon-check el-input__icon cursor-pointer" slot="suffix"
+                            :title="'Click to change ttl'" @click="ttlKey">
+                        </i>
+                    </el-input>
+                </el-form-item>
+
+                <!-- del refresh key btn -->
+                <el-form-item>
+                    <el-button type="danger" @click="deleteKey" icon="el-icon-delete"></el-button>
+                    <el-button type="success" @click="refresh" icon="el-icon-refresh"></el-button>
+                </el-form-item>
+            </el-form>
+
+            <!-- key content -->
+            <el-form class='key-content-string' v-if="key.type=='string'">
+                <!-- key content textarea -->
+                <el-form-item>
+                    <el-select v-model="selectedView" class='format-selector' :style='selectStyle' size='mini'>
+                        <span slot="prefix" class="fa fa-sitemap"></span>
+                        <el-option v-for="item in viewers" :key="item.value" :label="item.text" :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <span v-if='binary' class='formater-binary'>Hex</span>
+                    <!-- 字符串 -->
+                    <div v-if="selectedView=='ViewerText'">
+                        <el-input type='textarea' :rows='textrows' v-model='edit.content'></el-input>
+                    </div>
+                    <div class="text-formated-container" v-if="selectedView=='ViewerJson'">
+                        <!-- 未实现 -->
+                    </div>
+                </el-form-item>
+                <!-- save btn -->
+                <el-form-item>
+                    <el-button type="primary" @click="udpateValue">Save</el-button>
+                </el-form-item>
+            </el-form>
+
+            <!-- list -->
+
+            <!-- hset -->
+        </el-container>
+    </div>
+</body>
+<script>
+    const vscode = typeof (acquireVsCodeApi) != "undefined" ? acquireVsCodeApi() : null;
+    const postMessage = (message) => { if (vscode) { vscode.postMessage(message) } }
+    const vue = new Vue({
+        el: '#app',
+        data: {
+            key: { name: '', ttl: -1, content: null },
+            // copy from key
+            edit: { name: '', ttl: -1, content: null },
+            binary: false, selectStyle: { float: this.float },
+            selectedView: 'ViewerText', viewers: [
+                { value: 'ViewerText', text: 'Text' },
+                { value: 'ViewerJson', text: 'Json' },
+            ], textrows: 6
+        },
+        methods: {
+            rename() {
+                console.log(this.key.name)
+                postMessage({ type: 'rename', key: this.key })
+            },
+            refresh() {
+                postMessage({ type: 'refresh', key: this.key })
+            },
+            ttlKey() {
+                postMessage({ type: 'ttl', key: this.key })
+            },
+            deleteKey() {
+                postMessage({ type: 'delete', key: this.key })
+            },
+            udpateValue() {
+                postMessage({ type: 'update', key: this.key })
+            },
+            deepClone(obj) {
+                let objClone = Array.isArray(obj) ? [] : {};
+                if (obj && typeof obj === "object") {
+                    for (let key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            if (obj[key] && typeof obj[key] === "object") {
+                                objClone[key] = this.deepClone(obj[key]);
+                            } else {
+                                objClone[key] = obj[key];
+                            }
+                        }
+                    }
+                }
+                return objClone;
+            }
+        }
+    })
+    window.addEventListener('message', event => {
+        const data = event.data
+        switch (data.type) {
+            case 'detail':
+                vue.key = data.res
+                vue.edit = vue.deepClone(data.res)
+                break;
+            default:
+                break;
+        }
+    })
+    postMessage({ type: 'init' })
+</script>
+<style type="text/css">
+    body {
+        background-color: #FFFFFF;
+        font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    .key-tab-container {
+        margin-top: 30px;
+        padding-left: 5px;
+    }
+
+    .key-header-info {
+        margin-top: 15px;
+    }
+
+    .key-content-container {
+        margin-top: 15px;
+    }
+
+    .key-detail-filter-value {
+        width: 60%;
+        height: 24px;
+        padding: 0 5px;
+    }
+
+    /*tooltip in table width limit*/
+    .el-tooltip__popper {
+        max-width: 50%;
+    }
+
+    .content-binary {
+        color: #7ab3ef;
+        font-size: 80%;
+        float: left;
+    }
+
+    /* header */
+    .key-detail-type {
+        text-transform: capitalize;
+        text-align: center;
+        width: 28px;
+        display: inline-block;
+    }
+
+    /* viewer */
+    .format-selector {
+        width: 122px;
+    }
+
+    .format-selector .el-input__inner {
+        height: 22px;
+    }
+
+    .text-formated-container {
+        border: 1px solid #dcdfe6;
+        min-height: 114px;
+        padding: 5px 15px;
+        line-height: 1.5;
+        border-radius: 5px;
+    }
+
+    .dark-mode .text-formated-container {
+        border-color: #7f8ea5;
+    }
+
+    /*key field span*/
+    .vjs__tree span {
+        color: #616069;
+    }
+
+    .dark-mode .vjs__tree span:not([class^="vjs"]) {
+        color: #ebebec;
+    }
+
+    /*brackets*/
+    .dark-mode .vjs__tree .vjs__tree__node {
+        color: #9e9ea2;
+    }
+
+    .dark-mode .vjs__tree .vjs__tree__node:hover {
+        color: #20a0ff;
+    }
+
+    .collapse-container {
+        height: 27px;
+    }
+
+    .collapse-container .collapse-btn {
+        float: right;
+        padding: 9px 0;
+    }
+
+    .formater-binary {
+        padding-left: 5px;
+        color: #7ab3ef;
+        font-size: 80%;
+    }
+</style>
+
+</html>
