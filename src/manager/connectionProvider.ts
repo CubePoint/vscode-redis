@@ -72,9 +72,9 @@ export default class ConnectionProvider implements TreeDataProvider<AbstractNode
         return this.context.globalState.get<{ [key: string]: RedisConfig }>(CacheKey.CONECTIONS_CONFIG) || {};
     }
 
-    private init(redisConfig: RedisConfig) {
-        const client = ClientManager.getClient(redisConfig)
-        return Util.async((resolve) => {
+    private async init(redisConfig: RedisConfig) {
+        const client =await ClientManager.getClient(redisConfig)
+        return await Util.async((resolve) => {
             client.info((err, reply) => {
                 resolve(reply)
             })

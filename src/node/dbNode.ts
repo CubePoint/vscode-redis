@@ -7,26 +7,34 @@ import { ClientManager } from "../manager/clientManager";
 import AbstractNode from "./abstracNode";
 import KeyNode from "./keyNode";
 
-class DBNode extends AbstractNode {
+export default class DBNode extends AbstractNode {
 
     contextValue = NodeType.DB;
-    iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.png`);
-    constructor(readonly id: string, readonly index: number,
-        readonly name: string, readonly redisConfig: RedisConfig) {
+    pattern = "*";
+    constructor(readonly redisConfig: RedisConfig, readonly parentPattern: string, readonly name: string, readonly index: number) {
         super(name, TreeItemCollapsibleState.Collapsed);
+        this.id = `${redisConfig.host}-${redisConfig.port}-${index}-${parentPattern}.${name}`
+        this.iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.png`);
     }
 
     async getChildren(): Promise<AbstractNode[]> {
-        const client = ClientManager.getClient(this.redisConfig)
-        if (this.redisConfig.db != this.index) {
-            await promisify(client.select).bind(client)(this.index)
-            this.redisConfig.db = this.index
+        const client = await ClientManager.getClient(this.redisConfig, this.index)
+        const keys: string[] = await promisify(client.keys).bind(client)(this.pattern);
+
+        const prefixMap: { [key: string]: AbstractNode[] } = {}
+        for (const key of keys.sort()) {
+            let prefix = key.replace(this.pattern.replace("*", ""), "").split(":")[0];
+            if (!prefixMap[prefix]) prefixMap[prefix] = []
+            prefixMap[prefix].push(new KeyNode(this, key, this.redisConfig))
         }
-        const keys: string[] = await promisify(client.keys).bind(client)("*");
-        const result = keys.sort().map((key: string) => {
-            return new KeyNode(this, key, this.redisConfig)
+
+        return Object.keys(prefixMap).map((prefix: string) => {
+            if (prefixMap[prefix].length > 1) {
+                return new FolderNode(this.redisConfig, this.pattern, prefix, this.index)
+            } else {
+                return prefixMap[prefix][0]
+            }
         })
-        return result;
     }
 
     /**
@@ -37,4 +45,11 @@ class DBNode extends AbstractNode {
     }
 }
 
-export default DBNode
+class FolderNode extends DBNode {
+    contextValue = NodeType.FOLDER;
+    constructor(readonly redisConfig: RedisConfig, readonly parentPattern: string, readonly name: string, readonly index: number) {
+        super(redisConfig, parentPattern, name, index)
+        this.iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.svg`);
+        this.pattern = `${parentPattern.replace("*", "")}${name}:*`
+    }
+}

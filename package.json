@@ -76,7 +76,12 @@
             },
             {
                 "command": "redis.connection.delete",
-                "title": "delete connection",
+                "title": "Delete connection",
+                "icon": "resources/image/delete.png"
+            },
+            {
+                "command": "redis.key.del",
+                "title": "Delete Key",
                 "icon": "resources/image/delete.png"
             },
             {
@@ -85,7 +90,11 @@
             },
             {
                 "command": "redis.key.add",
-                "title": "add Key"
+                "title": "Add Key",
+                "icon": {
+                    "light": "resources/image/light/add.svg",
+                    "dark": "resources/image/dark/add.svg"
+                }
             }
         ],
         "menus": {
@@ -105,6 +114,21 @@
                 {
                     "command": "redis.connection.delete",
                     "when": "view == github.cweijan.redis && viewItem == connection",
+                    "group": "inline"
+                },
+                {
+                    "command": "redis.key.add",
+                    "when": "view == github.cweijan.redis && viewItem == db",
+                    "group": "inline"
+                },
+                {
+                    "command": "redis.key.add",
+                    "when": "view == github.cweijan.redis && viewItem == db",
+                    "group": "redis"
+                },
+                {
+                    "command": "redis.key.del",
+                    "when": "view == github.cweijan.redis && viewItem == key",
                     "group": "inline"
                 }
             ]
