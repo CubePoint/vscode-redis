@@ -1,0 +1,128 @@
+{
+    "name": "vscode-redis-client",
+    "displayName": "Redis",
+    "description": "Redis Client For VSCode",
+    "version": "1.0.0",
+    "publisher": "cweijan",
+    "engines": {
+        "vscode": "^1.30.0"
+    },
+    "license": "MIT",
+    "main": "./out/extension",
+    "categories": [
+        "Programming Languages"
+    ],
+    "keywords": [
+        "redis",
+        "tools",
+        "manager"
+    ],
+    "contributors": [
+        {
+            "name": "cweijan",
+            "email": "cweijan@163.com"
+        }
+    ],
+    "badges": [],
+    "icon": "resources/image/logo.png",
+    "homepage": "https://github.com/cweijan/vscode-redis/blob/master/README.md",
+    "bugs": {
+        "url": "https://github.com/cweijan/vscode-redis/issues",
+        "email": "cweijan@163.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cweijan/vscode-redis"
+    },
+    "activationEvents": [
+        "*"
+    ],
+    "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "github-cweijan-redis",
+                    "title": "Redis Explorer",
+                    "icon": "resources/image/icon.png"
+                }
+            ]
+        },
+        "views": {
+            "github-cweijan-redis": [
+                {
+                    "id": "github.cweijan.redis",
+                    "name": "Redis"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "redis.connection.add",
+                "title": "Add Connection",
+                "category": "Redis",
+                "icon": {
+                    "dark": "resources/image/dark/add.svg",
+                    "light": "resources/image/dark/add.svg"
+                }
+            },
+            {
+                "command": "redis.refresh",
+                "title": "Refresh",
+                "category": "Redis",
+                "icon": {
+                    "light": "resources/image/light/refresh.svg",
+                    "dark": "resources/image/dark/refresh.svg"
+                }
+            },
+            {
+                "command": "redis.connection.delete",
+                "title": "delete connection",
+                "icon": "resources/image/delete.png"
+            },
+            {
+                "command": "redis.key.detail",
+                "title": "View Key Detail"
+            },
+            {
+                "command": "redis.key.add",
+                "title": "add Key"
+            }
+        ],
+        "menus": {
+            "view/title": [
+                {
+                    "command": "redis.connection.add",
+                    "when": "view == github.cweijan.redis",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "redis.refresh",
+                    "when": "view == github.cweijan.redis",
+                    "group": "navigation@2"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "redis.connection.delete",
+                    "when": "view == github.cweijan.redis && viewItem == connection",
+                    "group": "inline"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc --build tsconfig.json",
+        "watch": "tsc -watch -p ./",
+        "tslint": "tslint -t verbose src/**/*.ts"
+    },
+    "devDependencies": {
+        "@types/node": "^13.13.0",
+        "@types/redis": "^2.8.18",
+        "typescript": "^3.8.3",
+        "vscode": "^1.1.36"
+    },
+    "dependencies": {
+        "redis": "^3.0.2"
+    }
+}
