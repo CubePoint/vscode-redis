@@ -8,7 +8,14 @@ export class ViewOption {
     public viewPath?: string;
     public viewTitle?: string;
     public splitResultView: boolean;
+    /**
+     * keep single page by viewType
+     */
     public singlePage?: boolean;
+    /**
+     * kill exists panel
+     */
+    public killHidden?: boolean;
     /**
      * receive webview send message 
      */
@@ -32,11 +39,17 @@ export class ViewManager {
      * @param viewOption 
      */
     public static createWebviewPanel(viewOption: ViewOption): Promise<void> {
-        if (!viewOption.singlePage) viewOption.singlePage = true
-        const currentStatu = this.viewStatu[viewOption.viewType]
-        if (viewOption.singlePage && currentStatu && !currentStatu.creating) {
-            if (viewOption.initListener) viewOption.initListener(currentStatu.instance)
-            return Promise.resolve(null);
+        if (typeof (viewOption.singlePage) == 'undefined') viewOption.singlePage = true
+        if (typeof (viewOption.killHidden) == 'undefined') viewOption.killHidden = true
+
+        const currentStatus = this.viewStatu[viewOption.viewType]
+        if (viewOption.singlePage && currentStatus && !currentStatus.creating) {
+            if (viewOption.killHidden && currentStatus.instance.visible == false) {
+                currentStatus.instance.dispose()
+            } else {
+                if (viewOption.initListener) viewOption.initListener(currentStatus.instance)
+                return Promise.resolve(null);
+            }
         }
 
         const columnType = viewOption.splitResultView ? vscode.ViewColumn.Two : vscode.ViewColumn.One;
