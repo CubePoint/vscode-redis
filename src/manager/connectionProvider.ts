@@ -49,7 +49,7 @@ export default class ConnectionProvider implements TreeDataProvider<AbstractNode
         const auth = await window.showInputBox({ prompt: "The auth of the redis. Leave empty to ignore", placeHolder: "auth", ignoreFocusOut: true });
         if (auth === undefined) return;
 
-        const id = `${host}:${port}`;
+        const id = `${host}@${port}`;
 
         const redisConfig = { host, port: parseInt(port), auth }
         await this.init(redisConfig);

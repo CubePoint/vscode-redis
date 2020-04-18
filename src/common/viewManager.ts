@@ -68,9 +68,9 @@ export class ViewManager {
                     { viewColumn: columnType, preserveFocus: true },
                     { enableScripts: true, retainContextWhenHidden: true },
                 );
-                webviewPanel.webview.html = data.replace(/\$\{webviewPath\}/gi,
-                    vscode.Uri.file(`${this.extensionPath}/resources/webview`)
-                        .with({ scheme: 'vscode-resource' }).toString());
+                webviewPanel.webview.html = data.replace(/("|')\/?(css|js)\b/gi,
+                    "$1"+vscode.Uri.file(`${this.extensionPath}/resources/webview`)
+                        .with({ scheme: 'vscode-resource' }).toString()+"/$2");
                 ViewManager.viewStatu[viewOption.viewType] = {
                     creating: true,
                     instance: webviewPanel,

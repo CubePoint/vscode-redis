@@ -66,6 +66,12 @@
                 }
             },
             {
+                "command": "redis.connection.terminal",
+                "title": "Open Terminal",
+                "category": "Redis",
+                "icon": "resources/image/terminal.svg"
+            },
+            {
                 "command": "redis.refresh",
                 "title": "Refresh",
                 "category": "Redis",
@@ -118,7 +124,12 @@
                 {
                     "command": "redis.connection.delete",
                     "when": "view == github.cweijan.redis && viewItem == connection",
-                    "group": "inline"
+                    "group": "inline@0"
+                },
+                {
+                    "command": "redis.connection.terminal",
+                    "when": "view == github.cweijan.redis && viewItem == connection",
+                    "group": "inline@1"
                 },
                 {
                     "command": "redis.connection.status",

@@ -9,6 +9,7 @@ import { ClientManager } from "../manager/clientManager";
 import { ViewManager } from "../common/viewManager";
 
 class ConnectionNode extends AbstractNode {
+
     contextValue = NodeType.CONNECTION;
     iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.png`);
     constructor(readonly name: string, readonly redisConfig: RedisConfig) {
@@ -24,6 +25,37 @@ class ConnectionNode extends AbstractNode {
         }
         return result
     }
+    async openTerminal(): Promise<any> {
+        const client = await ClientManager.getClient(this.redisConfig)
+        ViewManager.createWebviewPanel({
+            splitResultView: true, viewType: "redis.terminal",
+            viewTitle: `${this.redisConfig.host}@${this.redisConfig.port}`,
+            viewPath: "terminal", initListener: (viewPanel) => {
+                viewPanel.webview.postMessage({
+                    type: "init",
+                    config: this.redisConfig
+                })
+            }, receiveListener: (viewPanel, message) => {
+                switch (message.type) {
+                    case 'exec':
+                        if (!message.content) {
+                            return;
+                        }
+                        const splitCommand: string[] = message.content.replace(/ +/g, " ").split(' ')
+                        const command = splitCommand.shift()
+                        client.send_command(command, splitCommand, (err, response) => {
+                            const reply = err ? err.message : response
+                            viewPanel.webview.postMessage({ type: 'result', reply })
+                        })
+                        break;
+                    case 'exit':
+                        viewPanel.dispose()
+                        break;
+                }
+            }
+        })
+    }
+
     async showStatus(): Promise<any> {
         const client = await ClientManager.getClient(this.redisConfig)
         client.info((err, reply) => {
