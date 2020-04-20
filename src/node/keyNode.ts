@@ -13,7 +13,7 @@ export default class KeyNode extends AbstractNode {
 
     readonly contextValue = NodeType.KEY;
     readonly iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.png`);
-    constructor(readonly db: DBNode, readonly name: string, readonly redisConfig: RedisConfig) {
+    constructor(readonly db: DBNode, public name: string, readonly redisConfig: RedisConfig) {
         super(name, TreeItemCollapsibleState.None);
         this.id = `${this.db.id}.${this.name}`
         this.command = {
@@ -82,13 +82,18 @@ export default class KeyNode extends AbstractNode {
                     case 'refresh':
                         this.detail()
                         break;
+                    case 'rename':
+                        await promisify(client.rename).bind(client)(message.key.name, message.key.newName)
+                        this.name = message.key.newName
+                        vscode.commands.executeCommand(Command.REFRESH)
+                        break;
                     case 'del':
                         await promisify(client.del).bind(client)(message.key.name)
                         vscode.commands.executeCommand(Command.REFRESH)
                         break;
                     case 'ttl':
-                        await promisify(client.expire).bind(client)(message.key.name,message.key.ttl)
-                        viewPanel.webview.postMessage({res:`Change TTL for key:${message.key.name} success!`})
+                        await promisify(client.expire).bind(client)(message.key.name, message.key.ttl)
+                        viewPanel.webview.postMessage({ res: `Change TTL for key:${message.key.name} success!` })
                         vscode.commands.executeCommand(Command.REFRESH)
                         break;
                 }

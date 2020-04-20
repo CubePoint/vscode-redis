@@ -22,7 +22,7 @@ class ConnectionNode extends AbstractNode {
     async getChildren() {
         const result: DBNode[] = [];
         for (let i = 0; i < 16; i++) {
-            result.push(new DBNode(this.redisConfig, this.name, `DB${i}`, i));
+            result.push(new DBNode(this.redisConfig, "*", `DB${i}`, i));
         }
         return result
     }

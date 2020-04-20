@@ -14,7 +14,7 @@ export default class DBNode extends AbstractNode {
     pattern = "*";
     constructor(readonly redisConfig: RedisConfig, readonly parentPattern: string, readonly name: string, readonly index: number) {
         super(name, TreeItemCollapsibleState.Collapsed);
-        this.id = `${redisConfig.host}-${redisConfig.port}-${index}-${parentPattern}.${name}`
+        this.id = `${redisConfig.host}@${redisConfig.port}:${index}-${parentPattern}.${name}`
         this.iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.png`);
         this.collapsibleState = NodeState.get(this)
     }
@@ -51,6 +51,7 @@ class FolderNode extends DBNode {
     contextValue = NodeType.FOLDER;
     constructor(readonly redisConfig: RedisConfig, readonly parentPattern: string, readonly name: string, readonly index: number) {
         super(redisConfig, parentPattern, name, index)
+        this.id += ":"
         this.iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.svg`);
         this.pattern = `${parentPattern.replace("*", "")}${name}:*`
     }
