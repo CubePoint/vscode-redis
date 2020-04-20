@@ -82,9 +82,18 @@ export default class KeyNode extends AbstractNode {
                     case 'refresh':
                         this.detail()
                         break;
+                    case 'update':
+                        switch (message.key.type) {
+                            case 'string':
+                                await promisify(client.set).bind(client)(message.key.name, message.key.content)
+                                viewPanel.webview.postMessage({ res: `Update key ${message.key.name} to new value success!` })
+                                break;
+                        }
+                        break;
                     case 'rename':
                         await promisify(client.rename).bind(client)(message.key.name, message.key.newName)
                         this.name = message.key.newName
+                        this.detail()
                         vscode.commands.executeCommand(Command.REFRESH)
                         break;
                     case 'del':

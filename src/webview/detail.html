@@ -59,13 +59,14 @@
                     <div v-if="selectedView=='ViewerText'">
                         <el-input type='textarea' :rows='textrows' v-model='edit.content'></el-input>
                     </div>
+                    <!-- Json -->
                     <div class="text-formated-container" v-if="selectedView=='ViewerJson'">
-                        <!-- 未实现 -->
+                        <el-input type='textarea' :rows='textrows' v-model='edit.content'></el-input>
                     </div>
                 </el-form-item>
                 <!-- save btn -->
                 <el-form-item>
-                    <el-button type="primary" @click="udpateValue">Save</el-button>
+                    <el-button type="primary" @click="update()">Save</el-button>
                 </el-form-item>
             </el-form>
             <!-- array content -->
@@ -74,9 +75,9 @@
                     <!-- add button -->
                     <el-form :inline="true" size="small">
                         <el-form-item>
-                            <el-button size="small" type="primary" @click='editDialogVisiable=true'>
+                            <!-- <el-button size="small" type="primary" @click='editDialogVisiable=true'>
                                 Add New
-                            </el-button>
+                            </el-button> -->
                         </el-form-item>
                     </el-form>
                     <!-- edit & add dialog -->
@@ -108,7 +109,7 @@
                                 {{key.type=='hash'?scope.row.value:scope.row}}
                             </template>
                         </el-table-column>
-                        <el-table-column label="Operation" width="150" align="center">
+                        <!-- <el-table-column label="Operation" width="150" align="center">
                             <template slot="header" slot-scope="scope">
                                 <input class="el-input__inner key-detail-filter-value" v-model="filterValue"
                                     :placeholder="'Keyword Search'" />
@@ -119,7 +120,7 @@
                                 <el-button type="text" @click="deleteLine(scope.row)" icon="el-icon-delete" circle>
                                 </el-button>
                             </template>
-                        </el-table-column>
+                        </el-table-column> -->
                     </el-table>
                     <!-- <el-pagination class="pagenation-table-page-container" v-if="dataAfterFilter.length > pageSize"
                         :total="dataAfterFilter.length" :page-size="pageSize" :current-page.sync="pageIndex"
@@ -183,7 +184,7 @@
             ttlKey() {
                 postMessage({ type: 'ttl', key: { name: this.key.name, ttl: this.edit.ttl } })
             },
-            udpateValue() {
+            update() {
                 postMessage({ type: 'update', key: { name: this.key.name, type: this.key.type, content: this.edit.content } })
             },
             deepClone(obj) {
@@ -216,11 +217,6 @@
         }
     })
     postMessage({ type: 'init' })
-    setInterval(() => {
-        if (vue.edit && vue.edit.ttl && vue.edit.ttl != -1) {
-            vue.edit.ttl = vue.edit.ttl - 1
-        }
-    }, 1000)
 </script>
 <style type="text/css">
     body {
