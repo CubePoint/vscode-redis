@@ -29,7 +29,7 @@ export class ViewOption {
 export class ViewManager {
 
     private static extensionPath: string;
-    private static viewStatu: { [key: string]: { instance: WebviewPanel, creating: boolean, receiveListener: (viewPanel: WebviewPanel, message: any) => void } } = {};
+    private static viewStatu: { [key: string]: { instance: WebviewPanel, creating: boolean, initListener: (viewPanel: WebviewPanel) => void, receiveListener: (viewPanel: WebviewPanel, message: any) => void } } = {};
     public static initExtesnsionPath(extensionPath: string) {
         this.extensionPath = extensionPath;
     }
@@ -43,11 +43,15 @@ export class ViewManager {
         if (typeof (viewOption.killHidden) == 'undefined') viewOption.killHidden = true
 
         const currentStatus = this.viewStatu[viewOption.viewType]
-        if (viewOption.singlePage && currentStatus && !currentStatus.creating) {
+        if (viewOption.singlePage && currentStatus) {
             if (viewOption.killHidden && currentStatus.instance.visible == false) {
                 currentStatus.instance.dispose()
             } else {
-                viewOption.initListener(currentStatus.instance)
+                if (currentStatus.creating) {
+                    currentStatus.initListener = viewOption.initListener
+                } else if (viewOption.initListener) {
+                    viewOption.initListener(currentStatus.instance)
+                }
                 if (viewOption.receiveListener) currentStatus.receiveListener = viewOption.receiveListener
                 return Promise.resolve(null);
             }
@@ -56,7 +60,7 @@ export class ViewManager {
         const columnType = viewOption.splitResultView ? vscode.ViewColumn.Two : vscode.ViewColumn.One;
 
         return new Promise((resolve, reject) => {
-            fs.readFile(`${this.extensionPath}/resources/webview/${viewOption.viewPath}.html`, 'utf8', async (err, data) => {
+            fs.readFile(`${this.extensionPath}/src/webview/${viewOption.viewPath}.html`, 'utf8', async (err, data) => {
                 if (err) {
                     Console.log(err);
                     reject(err);
@@ -69,11 +73,12 @@ export class ViewManager {
                     { enableScripts: true, retainContextWhenHidden: true },
                 );
                 webviewPanel.webview.html = data.replace(/("|')\/?(css|js)\b/gi,
-                    "$1"+vscode.Uri.file(`${this.extensionPath}/resources/webview`)
-                        .with({ scheme: 'vscode-resource' }).toString()+"/$2");
+                    "$1" + vscode.Uri.file(`${this.extensionPath}/src/webview`)
+                        .with({ scheme: 'vscode-resource' }).toString() + "/$2");
                 ViewManager.viewStatu[viewOption.viewType] = {
                     creating: true,
                     instance: webviewPanel,
+                    initListener: viewOption.initListener,
                     receiveListener: viewOption.receiveListener
                 }
                 webviewPanel.onDidDispose(() => {
@@ -83,7 +88,9 @@ export class ViewManager {
                 webviewPanel.webview.onDidReceiveMessage((message) => {
                     if (message.type == 'init') {
                         newStatus.creating = false
-                        if (viewOption.initListener) { viewOption.initListener(webviewPanel) }
+                        if (newStatus.initListener) {
+                            newStatus.initListener(webviewPanel)
+                        }
                     } else if (newStatus.receiveListener) {
                         newStatus.receiveListener(webviewPanel, message)
                     }
