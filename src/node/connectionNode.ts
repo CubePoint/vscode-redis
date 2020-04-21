@@ -27,7 +27,7 @@ class ConnectionNode extends AbstractNode {
         return result
     }
     async openTerminal(): Promise<any> {
-        const client = await ClientManager.getClient(this.redisConfig)
+        const {client} = await ClientManager.getClient(this.redisConfig)
         ViewManager.createWebviewPanel({
             splitResultView: true, viewType: "redis.terminal",
             viewTitle: `${this.redisConfig.host}@${this.redisConfig.port}`,
@@ -59,7 +59,7 @@ class ConnectionNode extends AbstractNode {
     }
 
     async showStatus(): Promise<any> {
-        const client = await ClientManager.getClient(this.redisConfig)
+        const {client} = await ClientManager.getClient(this.redisConfig)
         client.info((err, reply) => {
             ViewManager.createWebviewPanel({
                 viewType: "redis.status", splitResultView: false,

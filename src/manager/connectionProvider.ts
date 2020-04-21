@@ -73,7 +73,7 @@ export default class ConnectionProvider implements TreeDataProvider<AbstractNode
     }
 
     private async init(redisConfig: RedisConfig) {
-        const client =await ClientManager.getClient(redisConfig)
+        const {client} =await ClientManager.getClient(redisConfig)
         return await Util.async((resolve) => {
             client.info((err, reply) => {
                 resolve(reply)

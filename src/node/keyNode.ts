@@ -31,7 +31,7 @@ export default class KeyNode extends AbstractNode {
     }
 
     public async delete() {
-        const client = await ClientManager.getClient(this.redisConfig, this.db.index);
+        const {client} = await ClientManager.getClient(this.redisConfig, this.db.index);
         await promisify(client.del).bind(client)(this.name)
         vscode.commands.executeCommand(Command.REFRESH)
     }
@@ -39,7 +39,7 @@ export default class KeyNode extends AbstractNode {
 
     public async detail() {
 
-        const client = await ClientManager.getClient(this.redisConfig, this.db.index);
+        const {client} = await ClientManager.getClient(this.redisConfig, this.db.index);
         const type = await promisify(client.type).bind(client)(this.name)
         let content: any;
         switch (type) {
