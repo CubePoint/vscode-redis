@@ -21,7 +21,8 @@ export default class DBNode extends AbstractNode {
 
     async getChildren(): Promise<AbstractNode[]> {
         const client = await ClientManager.getClient(this.redisConfig, this.index)
-        const keys: string[] = await promisify(client.keys).bind(client)(this.pattern);
+        let keys: string[] = await promisify(client.keys).bind(client)(this.pattern);
+        keys = keys.slice(0, 5000)
 
         const prefixMap: { [key: string]: AbstractNode[] } = {}
         for (const key of keys.sort()) {
