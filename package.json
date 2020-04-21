@@ -2,7 +2,7 @@
     "name": "vscode-redis-client",
     "displayName": "Redis",
     "description": "Redis Client For VSCode",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "cweijan",
     "engines": {
         "vscode": "^1.30.0"
