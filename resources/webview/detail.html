@@ -231,6 +231,8 @@
             case 'detail':
                 vue.key = data.res
                 vue.edit = vue.deepClone(data.res)
+                const temp = vue.edit.content + "".trim();
+                vue.selectedView = temp.startsWith("[") || temp.startsWith("{") ? "ViewerJson" : "ViewerText"
                 break;
             default:
                 vue.$message(data.res)
