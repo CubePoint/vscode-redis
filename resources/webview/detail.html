@@ -43,6 +43,17 @@
                 <el-form-item>
                     <el-button type="danger" @click="deleteKey" icon="el-icon-delete"></el-button>
                     <el-button type="success" @click="refresh" icon="el-icon-refresh"></el-button>
+                    <template v-if="key.type=='string'">
+                        <el-select v-model="selectedView" class='format-selector' :style='selectStyle' size='mini'>
+                            <span slot="prefix" class="fa fa-sitemap"></span>
+                            <el-option v-for="item in viewers" :key="item.value" :label="item.text" :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <!-- save btn -->
+                        <el-form-item>
+                            <el-button type="primary" @click="update()">Save</el-button>
+                        </el-form-item>
+                    </template>
                 </el-form-item>
             </el-form>
 
@@ -50,13 +61,9 @@
             <el-form class='key-content-string' v-if="key.type=='string'">
                 <!-- key content textarea -->
                 <el-form-item>
-                    <el-select v-model="selectedView" class='format-selector' :style='selectStyle' size='mini'>
-                        <span slot="prefix" class="fa fa-sitemap"></span>
-                        <el-option v-for="item in viewers" :key="item.value" :label="item.text" :value="item.value">
-                        </el-option>
-                    </el-select>
+
                     <span v-if='binary' class='formater-binary'>Hex</span>
-                    <div class="value-panel">
+                    <div class="value-panel" :style="'height:'+ dynamicHeight">
                         <!-- 字符串 -->
                         <div v-if="selectedView=='ViewerText'">
                             <el-input type='textarea' :autosize="{ minRows:6}" v-model='edit.content'></el-input>
@@ -67,10 +74,6 @@
                                 @input="changeByJson"></pre>
                         </div>
                     </div>
-                </el-form-item>
-                <!-- save btn -->
-                <el-form-item>
-                    <el-button type="primary" @click="update()">Save</el-button>
                 </el-form-item>
             </el-form>
             <!-- array content -->
@@ -167,9 +170,9 @@
             jsonContent() {
                 try {
                     return jsonFormatHighlight(JSON.parse(this.edit.content), {
-                        keyColor: '#9cdcfe',
-                        numberColor: '#B5CEA8',
-                        stringColor: '#CE9178',
+                        keyColor: '#C792EA',
+                        numberColor: '#CE9178',
+                        stringColor: '#92D69E',
                         trueColor: '#569cD6',
                         falseColor: '#569cD6',
                         nullColor: '#569cD6'
@@ -177,6 +180,8 @@
                 } catch (error) {
                     return this.edit.content;
                 }
+            }, dynamicHeight() {
+                return (window.innerHeight - 180) + "px"
             }
         },
         methods: {
@@ -255,7 +260,6 @@
     }
 
     .value-panel {
-        max-height: 50vw;
         overflow: scroll;
     }
 
@@ -299,6 +303,8 @@
 
     /* viewer */
     .format-selector {
+        margin-left: 20px;
+        margin-right: 20px;
         width: 122px;
     }
 
