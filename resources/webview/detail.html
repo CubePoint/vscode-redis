@@ -70,7 +70,7 @@
                         </div>
                         <!-- Json -->
                         <div v-if="selectedView=='ViewerJson'">
-                            <pre v-html="jsonContent" contenteditable="true" class="json-panel"
+                            <pre v-html="editTemp" contenteditable="true" class="json-panel"
                                 @input="changeByJson"></pre>
                         </div>
                     </div>
@@ -148,6 +148,7 @@
             key: { name: '', ttl: -1, content: null },
             // copy from key
             edit: { name: '', ttl: -1, content: null },
+            editTemp:null,
             editDialogVisiable: false,
             binary: false, selectStyle: { float: this.float },
             selectedView: 'ViewerText', viewers: [
@@ -166,6 +167,13 @@
                         return edit ? "Edit List" : "Add to list"
                 }
                 return ''
+            }, dynamicHeight() {
+                return (window.innerHeight - 180) + "px"
+            }
+        },
+        methods: {
+            changeByJson(event) {
+                this.edit.content = event.target.innerText;
             },
             jsonContent() {
                 try {
@@ -180,13 +188,6 @@
                 } catch (error) {
                     return this.edit.content;
                 }
-            }, dynamicHeight() {
-                return (window.innerHeight - 180) + "px"
-            }
-        },
-        methods: {
-            changeByJson(event) {
-                this.edit.content = event.target.innerText;
             },
             refresh() {
                 postMessage({ type: 'refresh', key: this.key })
@@ -236,6 +237,7 @@
             case 'detail':
                 vue.key = data.res
                 vue.edit = vue.deepClone(data.res)
+                vue.editTemp=vue.jsonContent()
                 const temp = vue.edit.content + "".trim();
                 vue.selectedView = temp.startsWith("[") || temp.startsWith("{") ? "ViewerJson" : "ViewerText"
                 break;
