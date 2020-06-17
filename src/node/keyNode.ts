@@ -31,7 +31,7 @@ export default class KeyNode extends AbstractNode {
     }
 
     public async delete() {
-        const {client} = await ClientManager.getClient(this.redisConfig, this.db.index);
+        const client = ClientManager.getClient(this.redisConfig);
         await promisify(client.del).bind(client)(this.name)
         vscode.commands.executeCommand(Command.REFRESH)
     }
@@ -39,7 +39,7 @@ export default class KeyNode extends AbstractNode {
 
     public async detail() {
 
-        const {client} = await ClientManager.getClient(this.redisConfig, this.db.index);
+        const client = ClientManager.getClient(this.redisConfig);
         const type = await promisify(client.type).bind(client)(this.name)
         let content: any;
         switch (type) {
@@ -65,8 +65,7 @@ export default class KeyNode extends AbstractNode {
                 break;
         }
         ViewManager.createWebviewPanel({
-            viewType: "redis.detail", viewPath: "detail",
-            viewTitle: "Key Detail", splitResultView: true,
+            path: "detail", title: "Detail", splitView: true,
             initListener: async (viewPanel) => {
                 viewPanel.webview.postMessage({
                     type: "detail",

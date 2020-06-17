@@ -20,18 +20,13 @@ class ConnectionNode extends AbstractNode {
     }
 
     async getChildren() {
-        const result: DBNode[] = [];
-        for (let i = 0; i < 16; i++) {
-            result.push(new DBNode(this.redisConfig, "*", `DB${i}`, i));
-        }
-        return result
+        return [new DBNode(this.redisConfig, "*", `DB${this.redisConfig.db}`, this.redisConfig.db)]
     }
     async openTerminal(): Promise<any> {
-        const {client} = await ClientManager.getClient(this.redisConfig)
+        const client = ClientManager.getClient(this.redisConfig)
         ViewManager.createWebviewPanel({
-            splitResultView: true, viewType: "redis.terminal",
-            viewTitle: `${this.redisConfig.host}@${this.redisConfig.port}`,
-            viewPath: "terminal", initListener: (viewPanel) => {
+            splitView: true, title: `${this.redisConfig.host}@${this.redisConfig.port}`,
+            path: "terminal", initListener: (viewPanel) => {
                 viewPanel.webview.postMessage({
                     type: "init",
                     config: this.redisConfig
@@ -59,12 +54,11 @@ class ConnectionNode extends AbstractNode {
     }
 
     async showStatus(): Promise<any> {
-        const {client} = await ClientManager.getClient(this.redisConfig)
+        const client = ClientManager.getClient(this.redisConfig)
         client.info((err, reply) => {
             ViewManager.createWebviewPanel({
-                viewType: "redis.status", splitResultView: false,
-                viewPath: "status", viewTitle: "Redis Server Status",
-                initListener: (viewPanel) => {
+                title: "Redis Server Status", splitView: false,
+                path: "status", initListener: (viewPanel) => {
                     viewPanel.webview.postMessage(reply)
                 }
             })

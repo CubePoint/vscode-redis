@@ -5,6 +5,8 @@ import AbstractNode from "../node/abstracNode";
 import { RedisConfig } from "../node/config/redisConfig";
 import ConnectionNode from "../node/connectionNode";
 import { ClientManager } from "./clientManager";
+import { ViewManager } from "../common/viewManager";
+import { rejects } from "assert";
 
 export default class ConnectionProvider implements TreeDataProvider<AbstractNode> {
     _onDidChangeTreeData: EventEmitter<AbstractNode> = new EventEmitter<AbstractNode>();
@@ -32,33 +34,29 @@ export default class ConnectionProvider implements TreeDataProvider<AbstractNode
     }
 
     async add() {
-        let host = await window.showInputBox({ prompt: "The hostname of the redis.", placeHolder: "host (default 127.0.0.1)", ignoreFocusOut: true });
-        if (host === undefined) {
-            return;
-        } else if (host === '') {
-            host = '127.0.0.1';
-        }
 
-        let port = await window.showInputBox({ prompt: "The port number to connect to.", placeHolder: "port (default 6379)", ignoreFocusOut: true });
-        if (port === undefined) {
-            return;
-        } else if (port === '') {
-            port = '6379';
-        }
+        ViewManager.createWebviewPanel({
+            title: "connect", path: "connect", splitView: false,
+            eventHandler: (handler) => {
+                handler.on("connect", async (redisConfig) => {
+                    const id = `${redisConfig.host}@${redisConfig.port}`;
 
-        const auth = await window.showInputBox({ prompt: "The auth of the redis. Leave empty to ignore", placeHolder: "auth", ignoreFocusOut: true });
-        if (auth === undefined) return;
+                    try {
+                        await this.init(redisConfig);
+                    } catch (err) {
+                        handler.emit('error', err.message)
+                        return;
+                    }
 
-        const id = `${host}@${port}`;
+                    const configs = this.getConnections();
+                    configs[id] = redisConfig;
+                    handler.panel.dispose()
+                    this.context.globalState.update(CacheKey.CONECTIONS_CONFIG, configs);
+                    this.refresh();
+                })
+            }
+        })
 
-        const redisConfig = { host, port: parseInt(port), auth }
-        await this.init(redisConfig);
-
-        const configs = this.getConnections();
-        configs[id] = redisConfig;
-        this.context.globalState.update(CacheKey.CONECTIONS_CONFIG, configs);
-
-        this.refresh();
     }
 
     delete(element: ConnectionNode) {
@@ -73,9 +71,12 @@ export default class ConnectionProvider implements TreeDataProvider<AbstractNode
     }
 
     private async init(redisConfig: RedisConfig) {
-        const {client} =await ClientManager.getClient(redisConfig)
-        return await Util.async((resolve) => {
+        const client = ClientManager.getClient(redisConfig)
+        return await Util.async((resolve, reject) => {
             client.info((err, reply) => {
+                if (err) {
+                    reject(err)
+                }
                 resolve(reply)
             })
         })

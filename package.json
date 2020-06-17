@@ -5,7 +5,7 @@
     "version": "1.1.2",
     "publisher": "cweijan",
     "engines": {
-        "vscode": "^1.30.0"
+        "vscode": "^1.38.0"
     },
     "license": "MIT",
     "main": "./out/extension",
@@ -163,12 +163,11 @@
     "devDependencies": {
         "@types/node": "^13.13.0",
         "@types/redis": "^2.8.18",
+        "@types/vscode": "1.38.0",
         "tslint": "^6.1.1",
-        "typescript": "^3.8.3",
-        "vscode": "^1.1.36"
+        "typescript": "^3.8.3"
     },
     "dependencies": {
-        "redis": "^3.0.2",
-        "async-lock": "^1.2.2"
+        "redis": "^3.0.2"
     }
 }
