@@ -20,6 +20,7 @@ class ConnectionNode extends AbstractNode {
     }
 
     async getChildren() {
+        if (!this.redisConfig.db) this.redisConfig.db = 0;
         return [new DBNode(this.redisConfig, "*", `DB${this.redisConfig.db}`, this.redisConfig.db)]
     }
     async openTerminal(): Promise<any> {
