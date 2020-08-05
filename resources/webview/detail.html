@@ -231,6 +231,11 @@
             }
         }
     })
+    window.addEventListener("keyup", event => {
+      if (event.key == "c" && event.ctrlKey) {
+        document.execCommand("copy");
+      }
+    });
     window.addEventListener('message', event => {
         const data = event.data
         switch (data.type) {
