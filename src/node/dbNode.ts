@@ -52,8 +52,9 @@ class FolderNode extends DBNode {
     contextValue = NodeType.FOLDER;
     constructor(readonly redisConfig: RedisConfig, readonly parentPattern: string, readonly name: string, readonly index: number) {
         super(redisConfig, parentPattern, name, index)
-        this.id += ":"
+        this.id += ":" + name
         this.iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.svg`);
         this.pattern = `${parentPattern.replace("*", "")}${name}:*`
+        this.collapsibleState = NodeState.get(this)
     }
 }
