@@ -65,9 +65,12 @@ export default class KeyNode extends AbstractNode {
                     (this.name, 0, await promisify(client.zcard).bind(client)(this.name))
                 break;
         }
+        const title = `${type}:${this.name}`;
         ViewManager.createWebviewPanel({
-            path: "detail", title: `${type}:${this.name}`, splitView: true, iconPath: this.iconDetailPath,
+            path: "detail", title: title, splitView: true, iconPath: this.iconDetailPath,
+            id: "detail",
             initListener: async (viewPanel) => {
+                viewPanel.title = title;
                 viewPanel.webview.postMessage({
                     type: "detail",
                     res: {

@@ -9,6 +9,7 @@ export class ViewOption {
     public iconPath?: string;
     public path: string;
     public title: string;
+    public id?: string;
     public splitView: boolean = false;
     /**
      * keep single page by viewType
@@ -67,11 +68,12 @@ export class ViewManager {
             if (typeof (viewOption.singlePage) == 'undefined') { viewOption.singlePage = true }
             if (typeof (viewOption.killHidden) == 'undefined') { viewOption.killHidden = true }
 
+            let id=viewOption.id||viewOption.title;
             if (!viewOption.singlePage) {
-                viewOption.title = viewOption.title + new Date().getTime()
+                id = viewOption.title + new Date().getTime()
             }
 
-            const currentStatus = this.viewStatu[viewOption.title]
+            const currentStatus = this.viewStatu[id]
             if (viewOption.singlePage && currentStatus) {
                 if (viewOption.killHidden && currentStatus.instance?.visible == false) {
                     currentStatus.instance.dispose()
@@ -91,7 +93,7 @@ export class ViewManager {
                 }
             }
             const newStatus = { creating: true, instance: null, eventEmitter: new EventEmitter(), initListener: viewOption.initListener, receiveListener: viewOption.receiveListener }
-            this.viewStatu[viewOption.title] = newStatus
+            this.viewStatu[id] = newStatus
             const targetPath = `${this.webviewPath}/${viewOption.path}.html`;
             fs.readFile(targetPath, 'utf8', async (err, data) => {
                 if (err) {
@@ -100,7 +102,7 @@ export class ViewManager {
                     return;
                 }
                 const webviewPanel = vscode.window.createWebviewPanel(
-                    viewOption.title,
+                    id,
                     viewOption.title,
                     {
                         viewColumn: viewOption.splitView ? vscode.ViewColumn.Two : vscode.ViewColumn.One,
@@ -111,12 +113,12 @@ export class ViewManager {
                 if (viewOption.iconPath) {
                     webviewPanel.iconPath = vscode.Uri.file(viewOption.iconPath)
                 }
-                this.viewStatu[viewOption.title].instance = webviewPanel
+                this.viewStatu[id].instance = webviewPanel
                 const contextPath = path.resolve(targetPath, "..");
                 webviewPanel.webview.html = this.buildPath(data, webviewPanel.webview, contextPath);
 
                 webviewPanel.onDidDispose(() => {
-                    this.viewStatu[viewOption.title] = null
+                    this.viewStatu[id] = null
                 })
                 if (viewOption.eventHandler) {
                     viewOption.eventHandler(new Hanlder(webviewPanel, newStatus.eventEmitter))
