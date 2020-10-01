@@ -13,6 +13,7 @@ class ConnectionNode extends AbstractNode {
 
     contextValue = NodeType.CONNECTION;
     iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.png`);
+    readonly iconDetailPath = path.join(__dirname, '..', '..', 'resources', 'image', `code-terminal.svg`);
     constructor(readonly name: string, readonly redisConfig: RedisConfig) {
         super(name, TreeItemCollapsibleState.Collapsed);
         this.id = name;
@@ -27,6 +28,7 @@ class ConnectionNode extends AbstractNode {
         const client = ClientManager.getClient(this.redisConfig)
         ViewManager.createWebviewPanel({
             splitView: true, title: `${this.redisConfig.host}@${this.redisConfig.port}`,
+            iconPath: this.iconDetailPath,
             path: "terminal", initListener: (viewPanel) => {
                 viewPanel.webview.postMessage({
                     type: "init",
