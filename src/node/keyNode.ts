@@ -13,6 +13,7 @@ export default class KeyNode extends AbstractNode {
 
     readonly contextValue = NodeType.KEY;
     readonly iconPath = path.join(__dirname, '..', '..', 'resources', 'image', `${this.contextValue}.png`);
+    readonly iconDetailPath = path.join(__dirname, '..', '..', 'resources', 'image', `redis.svg`);
     constructor(readonly db: DBNode, public name: string, readonly redisConfig: RedisConfig) {
         super(name, TreeItemCollapsibleState.None);
         this.id = `${this.db.id}.${this.name}`
@@ -65,7 +66,7 @@ export default class KeyNode extends AbstractNode {
                 break;
         }
         ViewManager.createWebviewPanel({
-            path: "detail", title: "Detail", splitView: true,
+            path: "detail", title: `${type}:${this.name}`, splitView: true, iconPath: this.iconDetailPath,
             initListener: async (viewPanel) => {
                 viewPanel.webview.postMessage({
                     type: "detail",
