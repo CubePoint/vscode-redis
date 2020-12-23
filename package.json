@@ -157,14 +157,12 @@
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc --build tsconfig.json",
-        "watch": "tsc -watch -p ./",
-        "tslint": "tslint -t verbose src/**/*.ts"
+        "watch": "tsc -watch -p ./"
     },
     "devDependencies": {
         "@types/node": "^13.13.0",
         "@types/redis": "^2.8.18",
         "@types/vscode": "1.38.0",
-        "tslint": "^6.1.1",
         "typescript": "^3.8.3"
     },
     "dependencies": {
