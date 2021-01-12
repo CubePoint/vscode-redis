@@ -7,6 +7,7 @@ import ConnectionNode from "../node/connectionNode";
 import { ClientManager } from "./clientManager";
 import { ViewManager } from "../common/viewManager";
 import { rejects } from "assert";
+import { InfoNode } from "../node/infoNode";
 
 export default class ConnectionProvider implements TreeDataProvider<AbstractNode> {
     _onDidChangeTreeData: EventEmitter<AbstractNode> = new EventEmitter<AbstractNode>();
@@ -25,7 +26,11 @@ export default class ConnectionProvider implements TreeDataProvider<AbstractNode
                 return new ConnectionNode(key, config[key]);
             })
         } else {
-            return element.getChildren()
+            try {
+                return element.getChildren()
+            } catch (error) {
+                [new InfoNode(error)]
+            }
         }
     }
 

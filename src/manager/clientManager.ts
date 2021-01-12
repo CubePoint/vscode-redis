@@ -17,7 +17,7 @@ export class ClientManager {
                 port: redisConfig.port,
                 db: redisConfig.db,
                 auth_pass: redisConfig.auth,
-                connect_timeout: 10000
+                connect_timeout: 7000
             })
         }
         return client;
