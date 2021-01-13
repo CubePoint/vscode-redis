@@ -8,6 +8,7 @@ import DBNode from "./dbNode";
 import { NodeState } from "../manager/nodeState";
 import { ClientManager } from "../manager/clientManager";
 import { ViewManager } from "../common/viewManager";
+import { InfoNode } from "./infoNode";
 
 class ConnectionNode extends AbstractNode {
 
@@ -20,9 +21,19 @@ class ConnectionNode extends AbstractNode {
         this.collapsibleState = NodeState.get(this)
     }
 
-    async getChildren() {
+    async getChildren(): Promise<AbstractNode[]> {
         if (!this.redisConfig.db) this.redisConfig.db = 0;
-        return [new DBNode(this.redisConfig, "*", `DB${this.redisConfig.db}`, this.redisConfig.db)]
+        return new Promise(res => {
+            let timeout = false;
+            const client = ClientManager.getClient(this.redisConfig)
+            setTimeout(() => {
+                timeout = true;
+                res([new InfoNode("Connect to redis server time out.")])
+            }, 5000);
+            client.ping(() => {
+                if (!timeout) res([new DBNode(this.redisConfig, "*", `DB${this.redisConfig.db}`, this.redisConfig.db)])
+            })
+        })
     }
     async openTerminal(): Promise<any> {
         const client = ClientManager.getClient(this.redisConfig)
