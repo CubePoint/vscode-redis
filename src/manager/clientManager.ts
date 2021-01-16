@@ -19,6 +19,7 @@ export class ClientManager {
                 auth_pass: redisConfig.auth,
                 connect_timeout: 7000
             })
+            this.activeClient[key] = client
         }
         return client;
     }
