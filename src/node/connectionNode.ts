@@ -1,6 +1,6 @@
 import path from "path";
 import { TreeItemCollapsibleState } from "vscode";
-import { NodeType, Command } from "../common/constant";
+import { NodeType, Command, CacheKey } from "../common/constant";
 import * as vscode from "vscode";
 import AbstractNode from "./abstracNode";
 import { RedisConfig } from "./config/redisConfig";
@@ -9,6 +9,7 @@ import { NodeState } from "../manager/nodeState";
 import { ClientManager } from "../manager/clientManager";
 import { ViewManager } from "../common/viewManager";
 import { InfoNode } from "./infoNode";
+import { GlobalState } from "../manager/globalState";
 
 class ConnectionNode extends AbstractNode {
 
@@ -77,6 +78,31 @@ class ConnectionNode extends AbstractNode {
                 }
             })
         })
+    }
+
+    async showChangedb(): Promise<any> {
+        const client = ClientManager.getClient(this.redisConfig)
+        let value = await vscode.window.showInputBox(
+            { // 这个对象中所有参数都是可选参数
+                password: false, // 输入内容是否是密码
+                ignoreFocusOut: false, // 默认false，设置为true时鼠标点击别的地方输入框不会消失
+                placeHolder: `请输入 (当前${this.redisConfig.db})`, // 在输入框内的提示信息
+                prompt: '0 ~ 15', // 在输入框下方的提示信息
+                validateInput: (text) => (parseInt(text).toString() == text ? null : '请输入0~15数字')
+            })
+        if (value === undefined) return
+
+        let db = parseInt(value)
+        client.select(db, (err) => {
+            if (err) { vscode.window.showErrorMessage(`切换失败(${err.message})`); return; }
+
+            this.redisConfig.db = db
+            const id = `${this.redisConfig.host}@${this.redisConfig.port}`
+            let configs = GlobalState.get(CacheKey.CONECTIONS_CONFIG) || {}
+            configs[id] = this.redisConfig
+            GlobalState.update(CacheKey.CONECTIONS_CONFIG, configs)
+            vscode.commands.executeCommand(Command.REFRESH)
+        });
     }
 }
 

@@ -72,6 +72,12 @@
                 "icon": "resources/image/terminal.svg"
             },
             {
+                "command": "redis.connection.changedb",
+                "title": "Changedb",
+                "category": "Redis",
+                "icon": "resources/image/database.svg"
+            },
+            {
                 "command": "redis.refresh",
                 "title": "Refresh",
                 "category": "Redis",
@@ -130,6 +136,11 @@
                     "command": "redis.connection.terminal",
                     "when": "view == github.cweijan.redis && viewItem == connection",
                     "group": "inline@1"
+                },
+                {
+                    "command": "redis.connection.changedb",
+                    "when": "view == github.cweijan.redis && viewItem == connection",
+                    "group": "inline@2"
                 },
                 {
                     "command": "redis.connection.status",

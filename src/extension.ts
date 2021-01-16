@@ -13,6 +13,7 @@ export function activate(context: ExtensionContext) {
         commands.registerCommand('redis.connection.status', (connectionNode: ConnectionNode) => connectionNode.showStatus()),
         commands.registerCommand('redis.connection.delete', (connectionNode: ConnectionNode) => serviceManager.provider.delete(connectionNode)),
         commands.registerCommand('redis.connection.terminal', (connectionNode: ConnectionNode) => connectionNode.openTerminal()),
+        commands.registerCommand('redis.connection.changedb', (connectionNode: ConnectionNode) => connectionNode.showChangedb()),
         commands.registerCommand(Command.REFRESH, () => serviceManager.provider.refresh()),
         commands.registerCommand('redis.key.add', (dbNode: DBNode) => dbNode.addKey()),
         commands.registerCommand('redis.key.detail', (keyNode: KeyNode) => keyNode.detail()),

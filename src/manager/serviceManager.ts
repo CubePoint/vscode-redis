@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { Disposable, ExtensionContext } from "vscode";
 import { ViewManager } from "../common/viewManager";
 import ConnectionProvider from "./connectionProvider";
+import { GlobalState } from "./globalState";
 import { NodeState } from "./nodeState";
 import Terminal from "./terminal";
 
@@ -16,6 +17,7 @@ export default class ServiceManager {
     public init(): Disposable[] {
         ViewManager.initExtesnsionPath(this.context.extensionPath)
         NodeState.init(this.context)
+        GlobalState.init(this.context)
         if (this.isInit) return []
         const res: Disposable[] = []
 
